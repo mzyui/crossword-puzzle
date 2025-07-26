@@ -3,6 +3,8 @@
 [![GitHub stars](https://img.shields.io/github/stars/mzyui/crossword-puzzle.svg?style=social&label=Star)](https://github.com/mzyui/crossword-puzzle)
 [![GitHub forks](https://img.shields.io/github/forks/mzyui/crossword-puzzle.svg?style=social&label=Fork)](https://github.com/mzyui/crossword-puzzle/fork)
 [![GitHub issues](https://img.shields.io/github/issues/mzyui/crossword-puzzle.svg)](https://github.com/mzyui/crossword-puzzle/issues)
+[![crates.io](https://img.shields.io/crates/v/crossword-puzzle.svg)](https://crates.io/crates/crossword-puzzle)
+[![docs.rs](https://docs.rs/crossword-puzzle/badge.svg)](https://docs.rs/crossword-puzzle)
 
 This is a Rust-based command-line application that generates crossword puzzles from a given list of words. It uses a backtracking algorithm to arrange words on a grid, handling placement, resizing, and validation.
 
