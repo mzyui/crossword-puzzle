@@ -564,7 +564,7 @@ fn eliminate_words<'a>(words_to_place: &[&'a str]) -> VecDeque<PossibleWord<'a>>
 /// ```
 /// use crossword_puzzle::{generate, Grid};
 ///
-/// let words = &["RUST", "CODE", "TEST"];
+/// let words = &["LOREM", "IPSUM", "DOLOR", "SIT", "AMET"];
 /// match generate(words) {
 ///     Ok(Some(grid)) => {
 ///         // Print the generated grid

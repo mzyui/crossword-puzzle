@@ -35,10 +35,10 @@ Replace `<word1> <word2> ...` with the words you want to use in your crossword p
 
 ## Example Usage
 
-To generate a crossword puzzle with the words "RUST", "CODE", and "TEST":
+To generate a crossword puzzle with the words "LOREM", "IPSUM", "DOLOR", "SIT", and "AMET":
 
 ```bash
-./target/release/crossword-puzzle RUST CODE TEST
+./target/release/crossword-puzzle LOREM IPSUM DOLOR SIT AMET
 ```
 
 The application will then print the generated crossword puzzle grid to the console.
