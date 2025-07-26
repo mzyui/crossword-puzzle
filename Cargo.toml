@@ -3,5 +3,12 @@
 name = "crossword-puzzle"
 version = "0.1.0"
 edition = "2021"
+description = "A Rust library and CLI tool for generating crossword puzzles."
+license = "MIT"
+authors = []
+repository = "https://github.com/mzyui/crossword-puzzle"
+homepage = "https://github.com/mzyui/crossword-puzzle"
+keywords = ["crossword", "puzzle", "generator", "cli", "game"]
+categories = ["games", "command-line-utilities"]
 
 
