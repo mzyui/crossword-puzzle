@@ -25,13 +25,29 @@ This will compile the project and create an executable in the `target/release/` 
 
 ## How to Run
 
-After building, you can run the application from the project's root directory.
+### Running from Source
+
+After building, you can run the application from the project's root directory:
 
 ```bash
 ./target/release/crossword-puzzle <word1> <word2> ...
 ```
 
 Replace `<word1> <word2> ...` with the words you want to use in your crossword puzzle. All words must be in uppercase.
+
+### Installation via Cargo
+
+If you have Rust and Cargo installed, you can install the `crossword-puzzle` CLI directly from `crates.io`:
+
+```bash
+cargo install crossword-puzzle
+```
+
+Once installed, the `crossword-puzzle` executable will be available in your Cargo bin directory (usually `~/.cargo/bin`), allowing you to run it from anywhere in your terminal:
+
+```bash
+crossword-puzzle <word1> <word2> ...
+```
 
 ## Example Usage
 
