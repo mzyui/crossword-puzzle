@@ -1,9 +1,13 @@
 use std::fmt;
 
 #[derive(Debug)]
-/// Represents errors that can occur when creating or manipulating a `Word`.
+/// `WordError` represents specific errors that can occur when creating, validating, or manipulating a `Word`.
+/// These errors typically arise from invalid input or attempts to create words that do not conform to expected rules.
+#[derive(Debug)]
 pub enum WordError {
+    /// Indicates that a word segment (prefix, crossed character, or suffix) is empty or contains only whitespace.
     EmptyOrWhitespaceSegment,
+    /// Indicates that a word segment contains lowercase characters, which are not allowed.
     LowercaseCharactersInSegment,
 }
 
@@ -23,9 +27,13 @@ impl fmt::Display for WordError {
 impl std::error::Error for WordError {}
 
 #[derive(Debug)]
-/// Represents errors that can occur during grid operations.
+/// `GridError` represents errors that can occur during operations on the crossword `Grid`.
+/// These errors typically relate to invalid directions, word placement issues, or underlying `WordError`s.
+#[derive(Debug)]
 pub enum GridError {
+    /// Indicates that an invalid or unsupported direction was provided for a grid operation.
     InvalidDirection(String),
+    /// Wraps a `WordError` that occurred during a grid operation, providing more context.
     WordError(WordError),
 }
 
@@ -47,10 +55,15 @@ impl From<WordError> for GridError {
 }
 
 #[derive(Debug)]
-/// Represents general application errors, encompassing `WordError` and `GridError`.
+/// `Error` represents general application errors, encompassing `WordError` and `GridError`,
+/// as well as custom error messages.
+#[derive(Debug)]
 pub enum Error {
+    /// Wraps a `WordError` that occurred within the application.
     WordError(WordError),
+    /// Wraps a `GridError` that occurred within the application.
     GridError(GridError),
+    /// Represents a custom error message, useful for general application-level failures.
     Custom(String),
 }
 
