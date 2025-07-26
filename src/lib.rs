@@ -9,7 +9,7 @@ pub mod word;
 
 /// Represents the neighboring cells of a position on the grid.
 #[derive(Debug, Default)]
-struct Neighbor {
+pub struct Neighbor {
     /// The character and position of the cell above.
     up: Option<(Position, char)>,
     /// The character and position of the cell to the right.
@@ -71,7 +71,7 @@ impl<'a> Grid<'a> {
     /// This is a recursive function that expands the grid by `amount` in the given `direction`.
     /// If `is_prepend` is true, cells are added at the beginning (top or left); otherwise, they are added at the end (bottom or right).
     /// Word positions are adjusted accordingly if cells are prepended.
-    fn resize_grid(
+    pub fn resize_grid(
         &mut self,
         amount: usize,
         direction: Direction,
@@ -123,7 +123,7 @@ impl<'a> Grid<'a> {
     /// Ensures the grid is large enough to accommodate a given word.
     /// This function checks if the word, including its prefix and suffix, would extend beyond the current grid boundaries.
     /// If necessary, it resizes the grid by calling `resize_grid` and adjusts the word's position to reflect the new grid dimensions.
-    fn ensure_grid_size(&mut self, word: &mut Word<'a>) -> Result<(), GridError> {
+    pub fn ensure_grid_size(&mut self, word: &mut Word<'a>) -> Result<(), GridError> {
         let position = &mut word.position;
         let segment = &word.segment;
 
@@ -161,7 +161,7 @@ impl<'a> Grid<'a> {
     /// Fills the grid with the characters of a given word.
     /// This function iterates through the characters of the word and places them onto the `board`
     /// at the word's calculated position and direction.
-    fn fill_word(&mut self, word: &Word<'a>) -> Result<(), GridError> {
+    pub fn fill_word(&mut self, word: &Word<'a>) -> Result<(), GridError> {
         match word.direction {
             Direction::Horizontal => {
                 for (ch, index) in word.segment.full_word().iter().zip(word.origin.x..) {
@@ -189,7 +189,7 @@ impl<'a> Grid<'a> {
     /// Returns the character at the given position on the grid, if it exists.
     /// This function safely retrieves a character from the `board` at the specified `Position`,
     /// returning `None` if the position is out of bounds.
-    fn get_char(&self, position: Position) -> Option<char> {
+    pub fn get_char(&self, position: Position) -> Option<char> {
         self.board
             .get(position.y)
             .and_then(|col| col.get(position.x))
@@ -198,7 +198,7 @@ impl<'a> Grid<'a> {
 
     /// Helper function to get a neighbor at a given offset from the current position.
     /// Returns `Some((Position, char))` if the neighbor exists and is within bounds, otherwise `None`.
-    fn get_neighbor_at_offset(
+    pub fn get_neighbor_at_offset(
         &self,
         current_pos: Position,
         dx: isize,
@@ -221,7 +221,7 @@ impl<'a> Grid<'a> {
     /// Returns the neighbors of a given position on the grid.
     /// This function checks the cells immediately above, right, below, and left of the given `position`.
     /// It returns a `Neighbor` struct containing the character and position of each existing neighbor.
-    fn get_neighbor(&self, position: Position) -> Neighbor {
+    pub fn get_neighbor(&self, position: Position) -> Neighbor {
         Neighbor {
             up: self.get_neighbor_at_offset(position, 0, -1),
             right: self.get_neighbor_at_offset(position, 1, 0),
@@ -233,7 +233,7 @@ impl<'a> Grid<'a> {
     /// Calculates the next position based on the current position, direction, and step.
     /// This helper function determines the new `Position` by moving `step` units from `current_pos`
     /// in the specified `direction` (Horizontal or Vertical).
-    fn get_next_pos(
+    pub fn get_next_pos(
         &self,
         current_pos: Position,
         direction: Direction,
@@ -255,7 +255,7 @@ impl<'a> Grid<'a> {
     /// Retrieves the coordinate value (x or y) based on the given direction.
     /// This helper function extracts either the `x` or `y` coordinate from `current_pos`   
     /// depending on the provided `direction` (Horizontal or Vertical).
-    fn get_coord_val(
+    pub fn get_coord_val(
         &self,
         current_pos: Position,
         direction: Direction,
@@ -268,7 +268,7 @@ impl<'a> Grid<'a> {
     }
 
     /// Helper function to check if a character option is empty or contains a space.
-    fn is_char_empty_or_none(&self, char_option: Option<(Position, char)>) -> bool {
+    pub fn is_char_empty_or_none(&self, char_option: Option<(Position, char)>) -> bool {
         match char_option {
             Some((_, ch)) => ch == ' ',
             None => true,
@@ -279,7 +279,7 @@ impl<'a> Grid<'a> {
     /// This function is used to validate if a word can be placed without conflicting with
     /// existing characters in adjacent cells (not directly part of the word's path).
     /// It examines the cells perpendicular to the word's direction at `current_pos`.
-    fn is_neighbor_cell_empty(
+    pub fn is_neighbor_cell_empty(
         &self,
         current_pos: Position,
         direction: Direction,
@@ -300,7 +300,7 @@ impl<'a> Grid<'a> {
     /// on the grid at its specified position and direction does not violate any crossword rules.
     /// It verifies that the word does not overlap with existing characters incorrectly and that
     /// adjacent cells are empty where required.
-    fn is_valid_placement(&self, word: &Word<'a>) -> Result<bool, GridError> {
+    pub fn is_valid_placement(&self, word: &Word<'a>) -> Result<bool, GridError> {
         let mut pos = word.position;
 
         // Check prefix
@@ -318,7 +318,7 @@ impl<'a> Grid<'a> {
     }
 
     /// Helper function to check the placement of a word segment (prefix or suffix).
-    fn check_segment_placement(
+    pub fn check_segment_placement(
         &self,
         word: &Word<'a>,
         pos: &mut Position,
@@ -357,7 +357,7 @@ impl<'a> Grid<'a> {
     /// This function searches for existing words on the grid that can be crossed by a new word segment.
     /// It generates potential `Word` candidates based on the `prefix`, `crossed` character, `suffix`,
     /// and `direction`, and then validates each potential placement.
-    fn find_valid_placements_for_segment(
+    pub fn find_valid_placements_for_segment(
         &self,
         prefix: &'a str,
         crossed: char,
@@ -439,7 +439,7 @@ impl<'a> Grid<'a> {
 
     /// Handles the initial placements when the grid is empty.
     /// It generates both horizontal and vertical word placements for the given segment.
-    fn handle_initial_placements(
+    pub fn handle_initial_placements(
         &self,
         prefix: &'a str,
         crossed: char,
@@ -457,7 +457,7 @@ impl<'a> Grid<'a> {
 }
 
 #[derive(Clone, Debug)]
-struct PossibleWord<'a> {
+pub struct PossibleWord<'a> {
     value: &'a str,
     remaining: usize,
 }
@@ -473,7 +473,7 @@ impl<'a> PossibleWord<'a> {
 
 /// A backtracking function to generate the crossword puzzle.
 /// Attempts to place words one by one onto the grid.
-fn backtrack<'a>(
+pub fn backtrack<'a>(
     grid: Grid<'a>,
     mut words_to_place: VecDeque<PossibleWord<'a>>,
 ) -> Result<Option<Grid<'a>>, Error> {
@@ -501,7 +501,7 @@ fn backtrack<'a>(
 /// This function filters the initial list of words, keeping only those that have at least
 /// one common character with another word in the list. This helps in reducing the search space
 /// for the crossword generation.
-fn eliminate_words<'a>(words_to_place: &[&'a str]) -> VecDeque<PossibleWord<'a>> {
+pub fn eliminate_words<'a>(words_to_place: &[&'a str]) -> VecDeque<PossibleWord<'a>> {
     let mut possible_words = Vec::new();
 
     for word_str in words_to_place.iter() {
