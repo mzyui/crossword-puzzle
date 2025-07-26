@@ -1,6 +1,5 @@
 use std::fmt;
 
-#[derive(Debug)]
 /// `WordError` represents specific errors that can occur when creating, validating, or manipulating a `Word`.
 /// These errors typically arise from invalid input or attempts to create words that do not conform to expected rules.
 #[derive(Debug)]
@@ -26,7 +25,6 @@ impl fmt::Display for WordError {
 
 impl std::error::Error for WordError {}
 
-#[derive(Debug)]
 /// `GridError` represents errors that can occur during operations on the crossword `Grid`.
 /// These errors typically relate to invalid directions, word placement issues, or underlying `WordError`s.
 #[derive(Debug)]
@@ -54,7 +52,6 @@ impl From<WordError> for GridError {
     }
 }
 
-#[derive(Debug)]
 /// `Error` represents general application errors, encompassing `WordError` and `GridError`,
 /// as well as custom error messages.
 #[derive(Debug)]

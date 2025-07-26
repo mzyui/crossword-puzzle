@@ -1,8 +1,7 @@
 use crate::error::WordError;
 
-#[derive(Debug, PartialEq, Clone, Copy, Default)]
 /// `Direction` defines the possible orientations for a word within the crossword puzzle grid.
-#[derive(Debug, PartialEq, Clone, Copy, Default)]
+#[derive(Default, Debug, Clone, Copy, PartialEq)]
 pub enum Direction {
     /// Represents a horizontal orientation, where the word extends from left to right.
     Horizontal,
@@ -16,7 +15,7 @@ pub enum Direction {
 
 /// `Position` represents the (x, y) coordinates of a cell on the crossword grid.
 /// `x` corresponds to the column index, and `y` corresponds to the row index.
-#[derive(Default, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Position {
     /// The x-coordinate (column index) of the position.
     pub x: usize,
@@ -24,10 +23,10 @@ pub struct Position {
     pub y: usize,
 }
 
-#[derive(Debug, Default, Clone)]
 /// `Segment` represents a part of a word, typically used when a word is broken down
 /// by a crossing character. It consists of a `prefix`, the `crossed` character itself,
 /// and a `suffix`.
+#[derive(Debug, Clone, Default)]
 pub struct Segment<'a> {
     /// The part of the word that comes before the `crossed` character.
     pub prefix: &'a str,
@@ -142,10 +141,10 @@ impl Segment<'_> {
     }
 }
 
-#[derive(Debug, Default, Clone)]
 /// `Word` represents a word intended for placement in the crossword puzzle.
 /// It encapsulates the word's content (`Segment`), its `Position` on the grid,
 /// its calculated `origin` (start of the word), and its `Direction`.
+#[derive(Debug, Clone, Default)]
 pub struct Word<'a> {
     /// The segment of the word.
     pub segment: Segment<'a>,

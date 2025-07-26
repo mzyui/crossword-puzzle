@@ -25,7 +25,6 @@ pub struct Neighbor {
     pub left: Option<(Position, char)>,
 }
 
-#[derive(Clone, Debug)]
 /// `Grid` represents the crossword puzzle board and manages the placement and validation of words.
 /// It dynamically resizes to accommodate words and provides methods for adding words and finding valid placements.
 #[derive(Clone, Debug)]
