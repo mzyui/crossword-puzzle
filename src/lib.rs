@@ -966,12 +966,13 @@ pub fn backtrack<'a>(
     mut words_to_place: VecDeque<PossibleWord<'a>>,
 ) -> Result<Option<Grid<'a>>, Error> {
     if let Some(mut current_word) = words_to_place.pop_front() {
-        let placements = grid.find_valid_placements(current_word.value)?;
+        let mut placements = grid.find_valid_placements(current_word.value)?;
         if placements.is_empty() && current_word.remaining > 1 {
             current_word.remaining = current_word.remaining.saturating_sub(1);
             words_to_place.push_back(current_word);
             return backtrack(grid, words_to_place);
         }
+        fastrand::shuffle(&mut placements);
         for placement_word in placements {
             let mut new_grid = grid.clone();
             new_grid.add_word(placement_word)?;
