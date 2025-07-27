@@ -944,18 +944,21 @@ impl<'a> PossibleWord<'a> {
 /// A backtracking function to generate the crossword puzzle.
 ///
 /// This function attempts to place words one by one onto the grid using a recursive
-/// backtracking approach. It explores possible placements for each word and, if a
-/// placement leads to a dead end, it backtracks to try another path.
+/// backtracking approach. It explores possible placements for each word. If a word
+/// cannot be placed in the current attempt and has remaining retries, it is re-queued
+/// for a later attempt. If a placement leads to a dead end, the function backtracks
+/// to try another path.
 ///
 /// # Arguments
 ///
 /// * `grid` - The current `Grid` state.
-/// * `words_to_place` - A `VecDeque` containing `PossibleWord`s that still need to be placed.
+/// * `words_to_place` - A `VecDeque` containing `PossibleWord`s that still need to be placed,
+///   along with their remaining placement attempts.
 ///
 /// # Returns
 ///
 /// - `Ok(Some(Grid))` if a complete and valid crossword puzzle grid is successfully generated.
-/// - `Ok(None)` if no valid grid can be generated from the given words.
+/// - `Ok(None)` if no valid grid can be generated from the given words after all attempts.
 /// - `Err(Error)` if an error occurs during grid operations (e.g., invalid word segments).
 ///
 /// # Errors

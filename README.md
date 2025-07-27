@@ -10,7 +10,8 @@ This is a Rust-based command-line application that generates crossword puzzles f
 
 ## Features
 
-- Generates crossword puzzles from a list of words.
+- Generates crossword puzzles from a list of words using a backtracking algorithm.
+- Eliminates words that do not share common characters to optimize generation.
 - Supports horizontal and vertical word placements.
 - Dynamically resizes the grid to accommodate words.
 - Includes custom error handling for word and grid operations.
@@ -79,7 +80,7 @@ You can use this crate as a library in your Rust project. Add it to your `Cargo.
 
 ```toml
 [dependencies]
-crossword-puzzle = "0.1.0"
+crossword-puzzle = "0.1.3"
 ```
 
 Then, you can use the `generate` function to create a crossword puzzle:
