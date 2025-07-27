@@ -80,7 +80,7 @@ You can use this crate as a library in your Rust project. Add it to your `Cargo.
 
 ```toml
 [dependencies]
-crossword-puzzle = "0.1.3"
+crossword-puzzle = "*"
 ```
 
 Then, you can use the `generate` function to create a crossword puzzle:
@@ -111,3 +111,11 @@ The application includes custom error types for `WordError` and `GridError` to p
 - Lowercase characters in word segments (all words must be uppercase).
 - Invalid directions for word placement or grid operations.
 - Inability to generate a puzzle with the given words.
+
+## To-Do List
+
+- [ ] Implement more sophisticated word placement algorithms.
+- [ ] Add support for different grid shapes and sizes.
+- [ ] Develop a graphical user interface (GUI).
+- [ ] Allow custom word lists from a file.
+- [ ] Improve error handling and user feedback.
