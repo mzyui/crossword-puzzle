@@ -1,6 +1,13 @@
+//! This is the main executable for the crossword puzzle generator.
+//! It takes a list of words as command-line arguments and attempts to generate
+//! a crossword puzzle from them.
+
 use crossword_puzzle::generate;
 use std::env;
 
+/// The main function of the crossword puzzle generator.
+/// It parses command-line arguments, calls the `generate` function from the
+/// `crossword_puzzle` crate, and prints the resulting crossword grid or an error message.
 fn main() {
     let args: Vec<String> = env::args().collect();
 
@@ -14,7 +21,7 @@ fn main() {
     match generate(&words) {
         Ok(Some(grid)) => {
             println!("Generated Crossword Puzzle:");
-            for row in grid.board {
+            for row in grid.board.iter() {
                 println!("{}", row.iter().collect::<String>());
             }
         }
