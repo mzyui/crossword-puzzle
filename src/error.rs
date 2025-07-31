@@ -1,3 +1,7 @@
+//! Defines the error types used throughout the crossword puzzle generator.
+//! This module provides a structured way to handle various issues that can arise
+//! during word processing, grid generation, and other application-level operations.
+
 use std::fmt;
 
 /// `WordError` represents specific errors that can occur when creating, validating, or manipulating a `Word`.
@@ -10,6 +14,7 @@ pub enum WordError {
     LowercaseCharactersInSegment,
 }
 
+/// Implements the `Display` trait for `WordError`, allowing errors to be formatted as user-friendly strings.
 impl fmt::Display for WordError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -23,6 +28,7 @@ impl fmt::Display for WordError {
     }
 }
 
+/// Implements the `Error` trait for `WordError`, providing a common interface for error handling.
 impl std::error::Error for WordError {}
 
 /// `GridError` represents errors that can occur during operations on the crossword `Grid`.
@@ -35,6 +41,7 @@ pub enum GridError {
     WordError(WordError),
 }
 
+/// Implements the `Display` trait for `GridError`, allowing errors to be formatted as user-friendly strings.
 impl fmt::Display for GridError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -44,8 +51,11 @@ impl fmt::Display for GridError {
     }
 }
 
+/// Implements the `Error` trait for `GridError`, providing a common interface for error handling.
 impl std::error::Error for GridError {}
 
+/// Implements conversion from `WordError` to `GridError`.
+/// This allows `WordError`s to be easily wrapped within `GridError`s.
 impl From<WordError> for GridError {
     fn from(err: WordError) -> Self {
         GridError::WordError(err)
@@ -64,6 +74,7 @@ pub enum Error {
     Custom(String),
 }
 
+/// Implements the `Display` trait for `Error`, allowing general application errors to be formatted as user-friendly strings.
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -74,14 +85,19 @@ impl fmt::Display for Error {
     }
 }
 
+/// Implements the `Error` trait for `Error`, providing a common interface for general application error handling.
 impl std::error::Error for Error {}
 
+/// Implements conversion from `WordError` to `Error`.
+/// This allows `WordError`s to be easily wrapped within the top-level `Error` type.
 impl From<WordError> for Error {
     fn from(err: WordError) -> Self {
         Error::WordError(err)
     }
 }
 
+/// Implements conversion from `GridError` to `Error`.
+/// This allows `GridError`s to be easily wrapped within the top-level `Error` type.
 impl From<GridError> for Error {
     fn from(err: GridError) -> Self {
         Error::GridError(err)
