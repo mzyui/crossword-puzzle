@@ -1,7 +1,19 @@
+//! This module defines the core data structures for representing words and their properties
+//! within the crossword puzzle generation logic. It includes definitions for `Direction`,
+//! `Position`, `Segment`, and `Word`, along with their associated methods for creation,
+//! manipulation, and validation.
+
+use std::fmt::Display;
+
+#[cfg(feature = "serde")]
+use serde::Serialize;
+
 use crate::error::WordError;
 
 /// `Direction` defines the possible orientations for a word within the crossword puzzle grid.
 #[derive(Default, Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "lowercase"))]
 pub enum Direction {
     /// Represents a horizontal orientation, where the word extends from left to right.
     Horizontal,
@@ -13,9 +25,20 @@ pub enum Direction {
     NotSet,
 }
 
+impl Display for Direction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match *self {
+            Self::Vertical => write!(f, "vertical"),
+            Self::Horizontal => write!(f, "horizontal"),
+            Self::NotSet => write!(f, "notset"),
+        }
+    }
+}
+
 /// `Position` represents the (x, y) coordinates of a cell on the crossword grid.
 /// `x` corresponds to the column index, and `y` corresponds to the row index.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
 pub struct Position {
     /// The x-coordinate (column index) of the position.
     pub x: usize,
@@ -26,7 +49,7 @@ pub struct Position {
 /// `Segment` represents a part of a word, typically used when a word is broken down
 /// by a crossing character. It consists of a `prefix`, the `crossed` character itself,
 /// and a `suffix`.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct Segment<'a> {
     /// The part of the word that comes before the `crossed` character.
     pub prefix: &'a str,
@@ -141,18 +164,35 @@ impl Segment<'_> {
     }
 }
 
+#[cfg(feature = "serde")]
+impl Serialize for Segment<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.full_word_str())
+    }
+}
+
 /// `Word` represents a word intended for placement in the crossword puzzle.
 /// It encapsulates the word's content (`Segment`), its `Position` on the grid,
 /// its calculated `origin` (start of the word), and its `Direction`.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Copy, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
 pub struct Word<'a> {
     /// The segment of the word.
+    #[cfg_attr(feature = "serde", serde(rename = "answer"))]
     pub segment: Segment<'a>,
     /// The position of the crossed character on the grid.
+    #[cfg_attr(feature = "serde", serde(skip))]
     pub position: Position,
+    /// The clue associated with this word.
+    pub clue: &'a str,
     /// The calculated origin of the word based on its position and direction.
+    #[cfg_attr(feature = "serde", serde(rename = "position"))]
     pub origin: Position,
     /// The direction of the word (horizontal or vertical).
+    #[cfg_attr(feature = "serde", serde(rename = "orientation"))]
     pub direction: Direction,
 }
 
@@ -243,6 +283,31 @@ impl<'a> Word<'a> {
         self
     }
 
+    /// Sets the clue for the word.
+    ///
+    /// This is a builder-pattern method, returning `self` for chaining.
+    ///
+    /// # Arguments
+    ///
+    /// * `clue` - The string slice representing the clue for the word.
+    ///
+    /// # Returns
+    ///
+    /// The `Word` instance with its `clue` updated.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossword_puzzle::word::Word;
+    ///
+    /// let word = Word::value("", 'A', "").unwrap().clue("A single letter");
+    /// assert_eq!(word.clue, "A single letter");
+    /// ```
+    pub fn clue(mut self, clue: &'a str) -> Self {
+        self.clue = clue;
+        self
+    }
+
     /// Updates the `origin` of the word based on its `position`, `direction`, and `prefix` length.
     ///
     /// The `origin` represents the `Position` of the very first character of the word on the grid.
@@ -312,5 +377,31 @@ impl<'a> Word<'a> {
 
             _ => vec![],
         }
+    }
+
+    /// Serializes the `Word` into a JSON string.
+    ///
+    /// This function requires the `serde` feature to be enabled.
+    ///
+    /// # Returns
+    ///
+    /// - `Ok(String)` containing the JSON representation of the word.
+    /// - `Err(serde_json::Error)` if serialization fails.
+    #[cfg(feature = "serde")]
+    pub fn to_json(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string(&self)
+    }
+
+    /// Serializes the `Word` into a pretty-printed JSON string.
+    ///
+    /// This function requires the `serde` feature to be enabled.
+    ///
+    /// # Returns
+    ///
+    /// - `Ok(String)` containing the pretty-printed JSON representation of the word.
+    /// - `Err(serde_json::Error)` if serialization fails.
+    #[cfg(feature = "serde")]
+    pub fn to_json_pretty(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string_pretty(&self)
     }
 }
