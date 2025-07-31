@@ -1,7 +1,7 @@
 # This file defines the project metadata and dependencies.
 [package]
 name = "crossword-puzzle"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 description = "A Rust library and CLI tool for generating crossword puzzles."
 license = "MIT"
