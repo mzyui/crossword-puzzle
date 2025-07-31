@@ -141,7 +141,7 @@ The `crossword-puzzle` library and CLI application provide JSON output for the g
     ["O"," "," "," ","U"," "],
     ["L","O","R","E","M"," "],
     ["O"," "," "," "," "," "],
-    ["R"," "," ", " ", " "],
+    ["R"," "," "," "," "," "],
   ]
 }
 ```
