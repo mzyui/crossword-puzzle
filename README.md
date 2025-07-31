@@ -63,15 +63,126 @@ To generate a crossword puzzle with the words "LOREM", "IPSUM", "DOLOR", "SIT", 
 The application will then print the generated crossword puzzle grid to the console.
 
 ```
-      A
-    I M
-    P E
-    SIT
- D  U  
-LOREM  
- L     
- O     
- R     
+     A
+     M
+     E
+   SIT
+    P
+D   S
+O   U
+LOREM
+O
+R
+```
+
+
+
+
+## JSON Output
+
+The `crossword-puzzle` library and CLI application provide JSON output for the generated grid, which can be useful for programmatic access or integration with other tools. The `Grid` and `Word` structs implement `serde::Serialize`, allowing them to be easily converted to JSON.
+
+```json
+{
+  "words": [
+    {
+      "answer": "DOLOR",
+      "clue": "",
+      "position": {
+        "x": 0,
+        "y": 5
+      },
+      "orientation": "vertical"
+    },
+    {
+      "answer": "LOREM",
+      "clue": "",
+      "position": {
+        "x": 0,
+        "y": 7
+      },
+      "orientation": "horizontal"
+    },
+    {
+      "answer": "IPSUM",
+      "clue": "",
+      "position": {
+        "x": 4,
+        "y": 3
+      },
+      "orientation": "vertical"
+    },
+    {
+      "answer": "SIT",
+      "clue": "",
+      "position": {
+        "x": 3,
+        "y": 3
+      },
+      "orientation": "horizontal"
+    },
+    {
+      "answer": "AMET",
+      "clue": "",
+      "position": {
+        "x": 5,
+        "y": 0
+      },
+      "orientation": "vertical"
+    }
+  ],
+  "board": [
+    [" "," "," "," "," ","A"],
+    [" "," "," "," "," ","M"],
+    [" "," "," "," "," ","E"],
+    [" "," "," ","S","I","T"],
+    [" "," "," "," ","P"," "],
+    ["D"," "," "," ","S"," "],
+    ["O"," "," "," ","U"," "],
+    ["L","O","R","E","M"," "],
+    ["O"," "," "," "," "," "],
+    ["R"," "," ", " ", " "],
+  ]
+}
+```
+
+
+### CLI Output
+
+When running the CLI application, the generated grid is printed to the console in a human-readable format, followed by its JSON representation. This allows for both quick visual inspection and easy parsing of the output.
+
+### Library Usage
+
+If you are using `crossword-puzzle` as a library, you can serialize the `Grid` object to JSON using the `to_json()` or `to_json_pretty()` methods:
+
+```rust
+use crossword_puzzle::{generate, Grid};
+
+fn main() {
+    let words = &["LOREM", "IPSUM", "DOLOR", "SIT", "AMET"];
+    match generate(words) {
+        Ok(Some(grid)) => {
+            // Get compact JSON string
+            let json_string = grid.to_json().unwrap();
+            println!("Compact JSON: {}", json_string);
+
+            // Get pretty-printed JSON string
+            let pretty_json_string = grid.to_json_pretty().unwrap();
+            println!("Pretty JSON:\n{}", pretty_json_string);
+        },
+        _ => (),
+    }
+}
+```
+
+This functionality is enabled by the `serde` feature. Ensure it is enabled in your `Cargo.toml` if you wish to use these methods:
+
+```toml
+[dependencies]
+crossword-puzzle = {
+    version = "*",
+    features = ["serde"]
+}
 ```
 
 ## Usage as a Library
