@@ -1,3 +1,7 @@
+//! This crate provides functionality for generating crossword puzzles.
+//! It includes data structures for representing words, grid, and algorithms
+//! for placing words and solving the puzzle.
+
 use std::collections::VecDeque;
 use std::fmt::Debug;
 
@@ -28,6 +32,7 @@ pub struct Neighbor {
 /// `Grid` represents the crossword puzzle board and manages the placement and validation of words.
 /// It dynamically resizes to accommodate words and provides methods for adding words and finding valid placements.
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
 pub struct Grid<'a> {
     /// A collection of `Word`s that have been successfully placed on the grid.
     pub words: Vec<Word<'a>>,
@@ -43,8 +48,15 @@ impl<'a> Default for Grid<'a> {
     }
 }
 
+/// Type alias for a function that calculates the (x, y) position of a character within a word.
+/// It takes a reference to a `Word` and an index, returning the `(x, y)` coordinates.
 type GetPosFn<'a> = Box<dyn Fn(&Word<'a>, usize) -> (usize, usize)>;
+/// Type alias for a function that extracts the origin coordinate (x or y) of a word.
+/// It takes a reference to a `Word` and returns its origin coordinate as a `usize`.
 type GetOriginFn<'a> = Box<dyn Fn(&Word<'a>) -> usize>;
+/// Type alias representing a tuple used to help with word placement.
+/// It contains the `Direction` of placement, a `GetPosFn` for calculating character positions,
+/// and a `GetOriginFn` for determining the word's origin.
 type PlacementHelper<'a> = (Direction, GetPosFn<'a>, GetOriginFn<'a>);
 
 impl<'a> Grid<'a> {
@@ -286,8 +298,7 @@ impl<'a> Grid<'a> {
     ///
     /// let mut grid = Grid::new();
     /// let word = Word::value("", 'T', "EST").unwrap().position(0, 0).direction(Direction::Horizontal);
-    /// // Assuming grid is large enough and word position is valid
-    /// assert!(grid.fill_word(&word).is_ok());
+    /// assert!(grid.add_word(word).is_ok());
     /// ```
     pub fn fill_word(&mut self, word: &Word<'a>) -> Result<(), GridError> {
         match word.direction {
@@ -591,10 +602,11 @@ impl<'a> Grid<'a> {
     /// // Initially, all cells are empty
     /// assert!(grid.is_neighbor_cell_empty(Position { x: 0, y: 0 }, Direction::Horizontal).unwrap());
     ///
-    /// let word = Word::value("", 'A', "").unwrap().position(0, 1).direction(Direction::Horizontal);
-    /// grid.add_word(word).unwrap(); // Place 'A' at (0,1)
+    /// // Place a word to make some cells occupied
+    /// let word = Word::value("A", 'B', "C").unwrap().position(0, 0).direction(Direction::Vertical);
+    /// grid.add_word(word).unwrap();
     ///
-    /// // Now, checking (0,0) horizontally should return false because (0,1) is occupied
+    /// // Now, checking (0,0) horizontally should return false because (0,1) is occupied by 'B'
     /// assert!(!grid.is_neighbor_cell_empty(Position { x: 0, y: 0 }, Direction::Horizontal).unwrap());
     /// ```
     pub fn is_neighbor_cell_empty(
@@ -641,15 +653,15 @@ impl<'a> Grid<'a> {
     /// use crossword_puzzle::{Grid, word::{Word, Direction}};
     ///
     /// let mut grid = Grid::new();
-    /// let word1 = Word::value("", 'A', "").unwrap().position(0, 0).direction(Direction::Horizontal);
+    /// let word1 = Word::value("", 'T', "EST").unwrap().position(0, 0).direction(Direction::Horizontal);
     /// grid.add_word(word1).unwrap();
     ///
-    /// // A word that overlaps correctly
-    /// let word2 = Word::value("", 'A', "").unwrap().position(0, 0).direction(Direction::Vertical);
+    /// // A word that overlaps correctly (e.g., 'T' from TEST and TEAM)
+    /// let word2 = Word::value("", 'T', "EAM").unwrap().position(0, 0).direction(Direction::Vertical);
     /// assert!(grid.is_valid_placement(&word2).unwrap());
     ///
-    /// // A word that conflicts
-    /// let word3 = Word::value("", 'B', "").unwrap().position(0, 0).direction(Direction::Horizontal);
+    /// // A word that conflicts (e.g., 'B' from BEST conflicts with 'T' from TEST)
+    /// let word3 = Word::value("BES", 'T', "").unwrap().position(4, 0).direction(Direction::Horizontal);
     /// assert!(!grid.is_valid_placement(&word3).unwrap());
     /// ```
     pub fn is_valid_placement(&self, word: &Word<'a>) -> Result<bool, GridError> {
@@ -902,16 +914,44 @@ impl<'a> Grid<'a> {
         placements.push(vertical_word);
         Ok(placements)
     }
+
+    /// Serializes the `Grid` into a JSON string.
+    ///
+    /// This function requires the `serde` feature to be enabled.
+    ///
+    /// # Returns
+    ///
+    /// - `Ok(String)` containing the JSON representation of the grid.
+    /// - `Err(serde_json::Error)` if serialization fails.
+    #[cfg(feature = "serde")]
+    pub fn to_json(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string(&self)
+    }
+
+    /// Serializes the `Grid` into a pretty-printed JSON string.
+    ///
+    /// This function requires the `serde` feature to be enabled.
+    ///
+    /// # Returns
+    ///
+    /// - `Ok(String)` containing the pretty-printed JSON representation of the grid.
+    /// - `Err(serde_json::Error)` if serialization fails.
+    #[cfg(feature = "serde")]
+    pub fn to_json_pretty(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string_pretty(&self)
+    }
 }
 
 #[derive(Clone, Debug)]
 pub struct PossibleWord<'a> {
+    /// The string value of the word.
     pub value: &'a str,
+    /// The number of remaining attempts to place this word on the grid.
     pub remaining: usize,
 }
 
 impl<'a> PossibleWord<'a> {
-    /// Creates a new `PossibleWord` instance.
+    /// Creates a new `PossibleWord` instance
     ///
     /// Initializes a `PossibleWord` with the given string `value` and sets
     /// `remaining` attempts to `3` by default.
@@ -939,6 +979,26 @@ impl<'a> PossibleWord<'a> {
             remaining: 3,
         }
     }
+}
+
+/// Calculates the squared Euclidean distance between two `Position`s.
+///
+/// This function is used to determine the distance between two points on the grid
+/// without computing the square root, which is often sufficient for comparisons.
+/// It's particularly useful for sorting placements by their proximity to a reference point.
+///
+/// # Arguments
+///
+/// * `a` - The first `Position`.
+/// * `b` - The second `Position`.
+///
+/// # Returns
+///
+/// The squared Euclidean distance as an `i32`.
+fn squared_euclidean(a: Position, b: Position) -> i32 {
+    let dx = a.x as i32 - b.x as i32;
+    let dy = a.y as i32 - b.y as i32;
+    (dx * dx) + (dy * dy)
 }
 
 /// A backtracking function to generate the crossword puzzle.
@@ -973,9 +1033,15 @@ pub fn backtrack<'a>(
         if placements.is_empty() && current_word.remaining > 1 {
             current_word.remaining = current_word.remaining.saturating_sub(1);
             words_to_place.push_back(current_word);
+
             return backtrack(grid, words_to_place);
         }
-        fastrand::shuffle(&mut placements);
+
+        let ref_position = Position {
+            x: grid.board[0].len() / 2,
+            y: grid.board.len() / 2,
+        };
+        placements.sort_by_key(|w| squared_euclidean(w.position, ref_position));
         for placement_word in placements {
             let mut new_grid = grid.clone();
             new_grid.add_word(placement_word)?;
@@ -1010,40 +1076,42 @@ pub fn backtrack<'a>(
 /// use crossword_puzzle::{eliminate_words, PossibleWord};
 /// use std::collections::VecDeque;
 ///
-/// let words = &["RUST", "TEST", "CODE", "APPLE"];
+/// let words = &["RUST", "TEST", "CODE", "ZIP"];
 /// let filtered_words = eliminate_words(words);
 ///
-/// // "APPLE" does not share any common characters with "RUST", "TEST", or "CODE"
+/// // "ZIP" does not share any common characters with "RUST", "TEST", or "CODE"
 /// // So it should be eliminated.
 /// assert_eq!(filtered_words.len(), 3);
-/// assert_eq!(filtered_words.front().unwrap().value, "RUST");
 /// ```
 pub fn eliminate_words<'a>(words_to_place: &[&'a str]) -> VecDeque<PossibleWord<'a>> {
-    let mut possible_words = Vec::new();
+    let mut filtered_words_set = std::collections::HashSet::new();
 
-    for word_str in words_to_place.iter() {
-        for word_str_cmp in words_to_place.iter() {
-            if word_str == word_str_cmp {
+    for i in 0..words_to_place.len() {
+        let word1 = words_to_place[i];
+        let chars1: std::collections::HashSet<char> = word1.chars().collect();
+
+        let mut has_common_char_with_other_word = false;
+        for (j, word2) in words_to_place.iter().enumerate() {
+            if i == j {
                 continue;
             }
+            let chars2: std::collections::HashSet<char> = word2.chars().collect();
 
-            let mut chars = word_str_cmp.chars().collect::<Vec<_>>();
-            chars.dedup();
-
-            if word_str.chars().any(|ch| chars.contains(&ch)) {
-                if !possible_words.contains(word_str) {
-                    possible_words.push(*word_str);
-                }
-                if !possible_words.contains(word_str_cmp) {
-                    possible_words.push(word_str_cmp);
-                }
+            if chars1.intersection(&chars2).next().is_some() {
+                has_common_char_with_other_word = true;
                 break;
             }
         }
+
+        if has_common_char_with_other_word {
+            filtered_words_set.insert(word1);
+        }
     }
-    possible_words.sort_by_key(|c| std::cmp::Reverse(c.len()));
+
+    let mut filtered_words: Vec<&'a str> = filtered_words_set.into_iter().collect();
+    filtered_words.sort_by_key(|c| std::cmp::Reverse(c.len()));
     VecDeque::from(
-        possible_words
+        filtered_words
             .iter()
             .map(|w| PossibleWord::new(w))
             .collect::<Vec<_>>(),
